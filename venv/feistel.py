@@ -41,7 +41,6 @@ def encrypt(input, rounds, roundkeys):
         key = roundkeys[round]
         f_rk = get_rnd_func_key(key, R)
         new_R = xor(L, f_rk)
-        #temp = R
         L = R
         R = new_R
 
@@ -62,7 +61,6 @@ def decrypt(input, rounds, roundkeys):
         key = roundkeys_reversed[round]
         f_rk = get_rnd_func_key(key, R)
         new_R = xor(L, f_rk)
-        # temp = R
         L = R
         R = new_R
 
