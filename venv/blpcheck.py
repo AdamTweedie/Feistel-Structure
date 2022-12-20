@@ -156,110 +156,90 @@ for c in cat:
 # MAIN
 
 def ssc(alice, bob, charlie):
-    # TODO: Implement check for simple security condition
-    # "alice", "bob", and "charlie" contain the currently executed rights
-    # In addition, the following global variables can be used (similar for bob and charlie)
-    # "rightsalice" contains the access control matrix for Alice
-    # "alicemaxprio" contains the maximum security level for Alice
-    # "alicemaxcat" contains the maximum security categories for Alice
-    # "alicecurrentprio" contains the current security level for Alice
-    # "alicecurrentcat" contains the current security categories for Alice
+    # Implement check for simple security condition
 
     subject_results = []
+    subjects = [alice, bob, charlie]
+    max_prios = [alicemaxprio, bobmaxprio, charliemaxprio]
+    max_cats = [alicemaxcat, bobmaxcat, charliemaxcat]
 
-    if len(alice) != 0:
-        valid = False
-        doc = list(alice.keys())[0]
-        action = list(alice.values())[0]
-        if action in ('e', 'a'):  # cannot read
-            valid = True
-        if action == 'r' or action == 'w':
-            # s dom o
-            if sec_int(get_required_sec_level(doc)) <= sec_int(alicemaxprio):
-                if all(x in alicemaxcat for x in get_required_sec_cat(doc)):
-                    if valid:  # if and only if
-                        valid = False
-                    else:
-                        valid = True
-        subject_results.append(valid)
-
-    if len(bob) != 0:
-        valid = False
-        doc = list(bob.keys())[0]
-        action = list(bob.values())[0]
-        if action in ('e', 'a'):  # cannot read
-            valid = True
-        if action == 'r' or action == 'w':
-            # s dom o
-            if sec_int(get_required_sec_level(doc)) <= sec_int(bobmaxprio):
-                if all(x in bobmaxcat for x in get_required_sec_cat(doc)):
-                    if valid:  # if and only if
-                        valid = False
-                    else:
-                        valid = True
-        subject_results.append(valid)
-
-    if len(charlie) != 0:
-        valid = False
-        doc = list(charlie.keys())[0]
-        action = list(charlie.values())[0]
-        if action in ('e', 'a'):  # cannot read
-            valid = True
-        if action == 'r' or action == 'w':
-            # s dom o
-            if sec_int(get_required_sec_level(doc)) <= sec_int(charliemaxprio):
-                if all(x in charliemaxcat for x in get_required_sec_cat(doc)):
-                    if valid:  # if and only if
-                        valid = False
-                    else:
-                        valid = True
-        subject_results.append(valid)
+    for subject, max_prio, max_cat in zip(subjects, max_prios, max_cats):
+        if len(subject) != 0:
+            valid = False
+            doc = list(subject.keys())[0]
+            action = list(subject.values())[0]
+            if action in ('e', 'a'):  # cannot read
+                valid = True
+            if action == 'r' or action == 'w':
+                # s dom o
+                if sec_int(get_required_sec_level(doc)) <= sec_int(max_prio):
+                    if all(x in max_cat for x in get_required_sec_cat(doc)):
+                        if valid:  # if and only if
+                            valid = False
+                        else:
+                            valid = True
+            subject_results.append(valid)
 
     return all(subject_results)
 
 
 def star(alice, bob, charlie):
-    # TODO: Implement check for star property
-    # "alice", "bob", and "charlie" contain the currently executed rights
-    # In addition, the following global variables can be used (similar for bob and charlie)
-    # "rightsalice" contains the access control matrix for Alice
-    # "alicemaxprio" contains the maximum security level for Alice
-    # "alicemaxcat" contains the maximum security categories for Alice
-    # "alicecurrentprio" contains the current security level for Alice
-    # "alicecurrentcat" contains the current security categories for Alice
+    # Implement check for star property
 
+    star_results = []
+    subjects = [alice, bob, charlie]
+    current_prio = [alicecurrentprio, bobcurrentprio, charliecurrentprio]
+    current_cat = [alicecurrentcat, bobcurrentcat, charliecurrentcat]
 
+    for subject, cur_prio, cur_cat in zip(subjects, current_prio, current_cat):
+        if len(subject) != 0:
+            doc = list(subject.keys())[0]
+            p = list(subject.values())[0]
+            if p == 'a':
+                # f(o) dom fc(s)
+                if sec_int(cur_prio) <= sec_int(get_required_sec_level(doc)):
+                    if all(x in get_required_sec_cat(doc) for x in cur_cat):
+                        star_results.append(True)
+                    else:
+                        star_results.append(False)
+            elif p == 'r':
+                # fc(s) dom f(o)
+                if sec_int(get_required_sec_level(doc)) <= sec_int(cur_prio):
+                    if all(x in cur_cat for x in get_required_sec_cat(doc)):
+                        star_results.append(True)
+                    else:
+                        star_results.append(False)
+            elif p == 'w':
+                # f(o) = fc(s)
+                if (get_required_sec_level(doc) == prio) and (get_required_sec_cat(doc) == cat):
+                    star_results.append(True)
+                else:
+                    star_results.append(False)
 
-
-
-
-
-    return False
+    return all(star_results)
 
 
 def ds(alice, bob, charlie):
-    # TODO: Implement check for discretionary security condition
-    # "alice", "bob", and "charlie" contain the currently executed rights
-    # In addition, the following global variables can be used (similar for bob and charlie)
-    # "rightsalice" contains the access control matrix for Alice
-    # "alicemaxprio" contains the maximum security level for Alice
-    # "alicemaxcat" contains the maximum security categories for Alice
-    # "alicecurrentprio" contains the current security level for Alice
-    # "alicecurrentcat" contains the current security categories for Alice
-    valid = False
+    # Implement check for discretionary security condition
 
-    if bool(alice):
-        doc = list(alice.keys())[0]
-        action = list(alice.values())[0]
+    subjects = [alice, bob, charlie]
+    subject_rights = [rightsalice, rightsbob, rightscharlie]
+    ds_results = []
+    for subject, rights in zip(subjects, subject_rights):
+        if len(subject) != 0:
+            doc = list(subject.keys())[0]
+            p = list(subject.values())[0]
 
-        print(action)
-        print(rightsalice[int(doc)])
-        # if (action == rightsalice[int(doc)]) and (alicecurrentprio >= alicemaxprio):
+            if p == rights[int(doc)]:
+                ds_results.append(True)
+            else:
+                ds_results.append(False)
 
-    return valid
+    return all(ds_results)
 
 
 def get_required_sec_level(doc):
+    # Get security level for each document
     doc_sec_levels = {
         "1": "l",
         "2": "h",
@@ -269,6 +249,7 @@ def get_required_sec_level(doc):
 
 
 def get_required_sec_cat(doc):
+    # get security category for each document
     doc_sec_cat = {
         "1": ["A", "B"],
         "2": ["C"],
@@ -277,14 +258,8 @@ def get_required_sec_cat(doc):
     return doc_sec_cat[doc]
 
 
-def get_document(doc):
-    documents = {
-        "1": {"l": ["A", "B"], "h": ["C"]},
-        "2": {"l": [""]}
-    }
-
-
 def sec_int(rating):
+    # convert the security level to integer
     return 1 if rating == "l" else 2
 
 
